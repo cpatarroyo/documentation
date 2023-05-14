@@ -1,12 +1,16 @@
+layout: page
+title: "Guia qPCR"
+permalink: /cpatarroyo.github.io/documentation/qpcr
+
 # Guia para el análisis de qPCR - Cuantificación relativa
 
 ### Fundamento
 
-La cuantificación relativa que se hace a través de una qPCR depende de la medida de fluorescencia en tiempo real durante la amplificación, y el parámetro que permite hacer la cuantificación es Ct. 
+La cuantificación relativa que se hace a través de una qPCR depende de la medida de fluorescencia en tiempo real durante la amplificación, y el parámetro que permite hacer la cuantificación es C~T~. 
 
 ![Grafica perfil de amplificación](qPCR_plot.png)
 
-*Umbral y Ct*
+*Umbral y C~T~*
 
 Ct es el ciclo en el que la fluorescencia de la muestra supera el umbral (Figura 1). Este umbral es puesto por el investigador. Una guía para colocar el umbral es la fluorescencia de los controles negativos y los blancos. El nivel de fluorescencia de estos controles debe estar siempre por debajo del umbral que se establezca. Al finalizar la qPCR, se obtienen los valores de Ct para cada una de las muestras.
 
