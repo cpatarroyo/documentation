@@ -1,7 +1,3 @@
-layout: page
-title: "Guia qPCR"
-permalink: /cpatarroyo.github.io/documentation/qpcr
-
 # Guia para el análisis de qPCR - Cuantificación relativa
 
 ### Fundamento
