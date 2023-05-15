@@ -84,9 +84,10 @@ Los datos correspondientes a la curva se organizan de la misma manera en una tab
 
 Y luego se crea un vector con los valores relativos de las diluciones seriadas de la siguiente manera:
 
-`#Para una curva de 5 puntos de diluciones seriadas 1:10
-
-diluciones <- rep(c(1,0.1,0.01,0.001,0.0001), each= 3)`
+```
+#Para una curva de 5 puntos de diluciones seriadas 1:10
+diluciones <- rep(c(1,0.1,0.01,0.001,0.0001), each= 3)
+```
 
 ### Cálculo de la eficiencia de reacción
 
