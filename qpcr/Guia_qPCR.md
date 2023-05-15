@@ -18,14 +18,21 @@ Para la cuantificación el umbral establecido va a funcionar entonces como una �
 
 Dependiendo del Ct se puede cuantificar relativamente la cantidad del gen de interés en una muestra comparado con una muestra control. Dicho en términos de estudios de expresión génica, cuanto más se expresa un gen en una muestra o condición comparado con una muestra control. 
 
-La cuantificación precisa se hace teniendo en cuenta que cada ciclo se duplica la cantidad de amplicones en una muestra. Esto es importante porque si una muestra A se demora un ciclo más en llegar al umbral que una muestra B, quiere decir que la muestra B tiene el doble de cantidad del gen de interés que la muestra A (o de otra manera, que la muestra A tiene la mitad de cantidad del gen de interés que la muestra B). De esta manera usando la diferencia entre los Ct de las muestras de interés se puede calcular relativamente la cantidad de nuestro gen de interés comparado a un control [^1].
+La cuantificación precisa se hace teniendo en cuenta que cada ciclo se duplica la cantidad de amplicones en una muestra. Esto es importante porque si una muestra A se demora un ciclo más en llegar al umbral que una muestra B, quiere decir que la muestra B tiene el doble de cantidad del gen de interés que la muestra A (o de otra manera, que la muestra A tiene la mitad de cantidad del gen de interés que la muestra B). De esta manera usando la diferencia entre los Ct de las muestras de interés se puede calcular la cantidad de ARNm del gen de interés en la condición experimental en términos de "veces" la cantidad del mismo gen en la condición control (en inglés el *fold-change*) [^1].
 
-Finalmente, lo último para tener en cuenta es que estos valores tienen que normalizarse. Esto se hace con respecto a un gen cuya expresión no cambia en diferentes condiciones (gen *housekeeping*) usando el Ct de la siguiente manera: 
+Finalmente, lo último para tener en cuenta es que estos valores tienen que normalizarse. Esto se hace con respecto a un gen cuya expresión no cambia en diferentes condiciones (gen *housekeeping*) usando el Ct de la siguiente manera [^1]: 
 
-1. Se calcula la diferencia de Ct del gen de interés entre la condición control y la condición de interés (&Delta;Ct gen).
-2. Se calcula la diferencia de Ct del gen *housekeeping* entre la condición control y la condición de interés ( &Delta; Ct hk).
-3. Se hace la resta &Delta; Ct gen - &Delta; Ct hk = &Delta; &Delta; Ct.
-4. La diferencia de expresión (*fold-change*) del gen de interés 2^-( &Delta; &Delta; Ct). [^1]
+1. Se calcula la diferencia de Ct del gen de interés entre la condición control y la condición de interés &Delta;Ct gen.
+  - &Delta;Ct gen = Ct gen (cond control) - Ct gen (cond interés)
+2. Se calcula la diferencia de Ct del gen *housekeeping* entre la condición control y la condición de interés &Delta;Ct hk.
+  - &Delta;Ct hk = Ct hk (cond control) - Ct hk (cond interés) 
+3. Se calcula el &Delta;&Delta;Ct.
+  - &Delta;&Delta;Ct = &Delta;Ct gen - &Delta;Ct hk
+4. La diferencia de expresión (*fold-change*) del gen de interés 2^-(&Delta;&Delta;Ct).
+
+  > Esto es asumiendo que la eficiencia de la reacción es del 100%. Es decir que cada ciclo la cantidad de producto de PCR es **exactamente** el doble que en el ciclo anterior. Esto es lo esperado para amplicones de alrededor de 150pb [^1]. Sin embargo, la formula propuesta por Livak y Schmittgen incluye el valor de la eficiencia y se puede reemplazar cuando este valor es diferente al 100% de la siguiente manera:
+  
+  > Diferencia de expresión = (1+Eficiencia)^-(&Delta;&Delta;Ct).
 
 [^1]: Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2(-Delta Delta C(T)) Method. Methods. 2001 Dec;25(4):402-8. https://doi.org/10.1006/meth.2001.1262. PMID: 11846609.
 
