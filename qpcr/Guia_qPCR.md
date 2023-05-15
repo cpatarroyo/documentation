@@ -35,8 +35,68 @@ Finalmente, lo último para tener en cuenta es que estos valores tienen que norm
   
   > Diferencia de expresión = (1+Eficiencia)^-(&Delta;&Delta;Ct).
 
+## Calculos
+
+Guía para calcular expresión diferencial de un gen usando el paquete de R `pcr` [^2].
+
+### Preparación
+
+Antes de hacer los cálculos de eficiencia de la reacción y de expresión diferencial es necesario organizar los datos en un formato compatible con el paquete `pcr`. Primero se promedian los valores de Ct de las replicas técnicas para cada una de las replicas biológicas. Luego los valores de Ct se organizan en filas y los genes en columnas de la siguiente manera:
+
+|b-tubulina|Fenol-Monooxigenasa|
+|-----------|-------------|
+|30.72|23.70|
+|30.34|23.56|
+|30.58|23.47|
+|30.34|23.65|
+|30.50|23.69|
+|30.43|23.68|
+|27.06|22.76|
+|27.03|22.61|
+|27.03|22.62|
+|27.10|22.60|
+|26.99|22.61|
+|26.94|22.76|
+
+A pesar de que las muestras deben estar organizadas por tratamiento (en este caso las 6 primeras pertenecen a la condición control “Glucosa” y las 6 siguientes a la condición experimental “Fenol”), los tratamientos no se colocan en la tabla. Para esto se crea un vector con los nombres de los tratamientos:
+
+`tratamientos <- rep(c(“Glucosa”,”Fenol”), each=6)`
+
+Los datos correspondientes a la curva se organizan de la misma manera en una tabla que contiene los valores de Ct por separado (sin promediar) para las diferentes diluciones: 
+
+|b-tubulina|Fenol-Monooxigenasa|
+|-----------|-------------|
+|25.57823| 22.60794|
+|25.53636| 22.68348|
+|25.50280|22.62602|
+|26.70615| 23.67162|
+|26.72720| 23.64855|
+|26.86921|23.70494|
+|28.16874| 25.11064|
+|28.06759| 25.11985|
+|28.10531| 25.10976|
+|29.19743| 26.16919|
+|29.49406| 26.15119|
+|29.07117 |26.15019|
+|30.16878 |27.11533|
+|30.14193 |27.13934|
+|30.11671 |27.16338|
+
+Y luego se crea un vector con los valores relativos de las diluciones seriadas de la siguiente manera:
+
+`#Para una curva de 5 puntos de diluciones seriadas 1:10
+
+diluciones <- rep(c(1,0.1,0.01,0.001,0.0001), each= 3)`
+
+### Cálculo de la eficiencia de reacción
+
+### Cálculo de expresión diferencial
+
+
 [^1]: Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2(-Delta Delta C(T)) Method. Methods. 2001 Dec;25(4):402-8. https://doi.org/10.1006/meth.2001.1262. PMID: 11846609.
 
 [^2]: Ahmed M, Kim DR. pcr: an R package for quality assessment, analysis and testing of qPCR data. PeerJ. 2018 Mar 16;6:e4473. https://doi.org/10.7717/peerj.4473. PMID: 29576953; PMCID: PMC5858653.
 
-[^3]: Yuan, J.S., Reed, A., Chen, F. et al. Statistical analysis of real-time PCR data. BMC Bioinformatics 7, 85 (2006). https://doi.org/10.1186/1471-2105-7-85
+[^3]: Obermeyer S, Stöckl R, Schnekenburger T, Moehle C, Schwartz U, Grasser KD. Distinct role of subunits of the Arabidopsis RNA polymerase II elongation factor PAF1C in transcriptional reprogramming. Front Plant Sci. 2022 Sep 29;13:974625. doi: 10.3389/fpls.2022.974625. PMID: 36247629; PMCID: PMC9558118.
+
+[^4]: Yuan, J.S., Reed, A., Chen, F. et al. Statistical analysis of real-time PCR data. BMC Bioinformatics 7, 85 (2006). https://doi.org/10.1186/1471-2105-7-85
