@@ -22,10 +22,10 @@ La cuantificación precisa se hace teniendo en cuenta que cada ciclo se duplica 
 
 Finalmente, lo último para tener en cuenta es que estos valores tienen que normalizarse. Esto se hace con respecto a un gen cuya expresión no cambia en diferentes condiciones (gen *housekeeping*) usando el Ct de la siguiente manera: 
 
-1. Se calcula la diferencia de Ct del gen de interés entre la condición control y la condición de interés ( $\Delta$ Ct gen).
-2. Se calcula la diferencia de Ct del gen *housekeeping* entre la condición control y la condición de interés ( $\Delta$ Ct hk).
-3. Se hace la resta $\Delta$ Ct gen - $\Delta$ Ct hk = $\Delta$ $\Delta$ Ct.
-4. La diferencia de expresión (*fold-change*) del gen de interés 2^-( $\Delta$ $\Delta$ Ct). [^1]
+1. Se calcula la diferencia de Ct del gen de interés entre la condición control y la condición de interés (&Delta;Ct gen).
+2. Se calcula la diferencia de Ct del gen *housekeeping* entre la condición control y la condición de interés ( &Delta; Ct hk).
+3. Se hace la resta &Delta; Ct gen - &Delta; Ct hk = &Delta; &Delta; Ct.
+4. La diferencia de expresión (*fold-change*) del gen de interés 2^-( &Delta; &Delta; Ct). [^1]
 
 [^1]: Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2(-Delta Delta C(T)) Method. Methods. 2001 Dec;25(4):402-8. https://doi.org/10.1006/meth.2001.1262. PMID: 11846609.
 
