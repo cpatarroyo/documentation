@@ -172,10 +172,62 @@ Teniendo estos datos, el cálculo de la expresión diferencial por este método 
 
 Para este ejemplo, debido a que la eficiencia de reacción no es del 100% como se mostró en la sección de cuantificación de la eficiencia, el método mas acertado para calcular la expresión diferencial es el de la curva relativa estándar. Esto se evidencia en que la desviación estándar de la cuantificación es mucho menor cuando se calcula por este método comparado con el método &Delta;&Delta;Ct.
 
+### Pruebas estadísticas 
+
+Para comparar la expresión de uno o varios genes entre **dos condiciones o grupos** (como en el ejemplo en el que está la condición control Glucosa y la condición experimental Fenol) se pueden utilizar las pruebas t test y la prueba Wilcox. Cuando se comparan 3 o más condiciones o grupos se debe usar la prueba de modelo lineal [^3].
+
+#### T test
+
+Requisitos:
+- Los valores de Ct están normalmente distribuidos.
+- La varianza entre las dos condiciones es comparable.
+- Solo se quieren comparar dos condiciones/grupos.
+
+Si los datos cumplen estas condiciones, la prueba se hace de la siguiente manera:
+
+`pcr_test(datos_ct, group_var = tratamientos, reference_gene = ‘b_tubulina', reference_group =’Glucosa’, test = 't.test')`
+
+```
+  gene                  estimate   p_value        lower       upper
+1 fenol_monooxigenasa   -2.495     3.466603e-10   -2.680535   -2.309465
+```
+
+El estimado (*estimate*) se refiere al &Delta;Ct normalizado por el gen *housekeeping* calculado para el gen de interés (en este ejemplo la fenol monooxigenasa). El p_value es el valor de la probabilidad de que la diferencia estimada de &Delta;Ct sea dada por azar. Finalmente *lower* y *upper* son los valores inferiores y superiores del intervalo de confianza del 95% de la estimación del &Delta;Ct [^3].
+
+#### Prueba Wilcox
+
+Requisitos:
+- Los requisitos para aplicar la prueba t son difíciles de cumplir.
+- Solo se quieren comparar dos condiciones/grupos.
+
+Si los datos cumplen estas condiciones, la prueba se hace de la siguiente manera:
+
+`pcr_test(datos_ct, group_var = tratamientos, reference_gene = 'b_tubulina', reference_group ='Glucosa', test = 'wilcox.test')`
+
+```
+  gene                    estimate   p_value        lower   upper
+1 fenol_monooxigenasa     -2.465     0.002164502    -2.7    -2.31
+```
+
+El estimado (*estimate*) se refiere al &Delta;Ct normalizado por el gen *housekeeping* calculado para el gen de interés (en este ejemplo la fenol monooxigenasa). El p_value es el valor de la probabilidad de que la diferencia estimada de &Delta;Ct sea dada por azar. Finalmente *lower* y *upper* son los valores inferiores y superiores de la estimación del &Delta;Ct [^3].
+
+#### Modelo lineal
+
+Requisitos:
+- Este modelo se usa para comparar mas de dos grupos o condiciones experimentales.
+
+Si los datos cumplen estas condiciones, la prueba se hace de la siguiente manera:
+
+`pcr_test(datos_ct, group_var = tratamientos, reference_gene = 'b_tubulina', reference_group ='Glucosa', test = 'lm')`
+
+Esta prueba estadística arroja una columna adicional: *term*. En esta columna se separan los grupos experimentales y se arroja el estimado de &Delta;Ct para cada grupo junto con el valor p y el intervalo de confianza del 95% [^3].
+
+## Referencias
+
 [^1]: Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2(-Delta Delta C(T)) Method. Methods. 2001 Dec;25(4):402-8. https://doi.org/10.1006/meth.2001.1262. PMID: 11846609.
 
 [^2]: Ahmed M, Kim DR. pcr: an R package for quality assessment, analysis and testing of qPCR data. PeerJ. 2018 Mar 16;6:e4473. https://doi.org/10.7717/peerj.4473. PMID: 29576953; PMCID: PMC5858653.
 
-[^3]: Obermeyer S, Stöckl R, Schnekenburger T, Moehle C, Schwartz U, Grasser KD. Distinct role of subunits of the Arabidopsis RNA polymerase II elongation factor PAF1C in transcriptional reprogramming. Front Plant Sci. 2022 Sep 29;13:974625. doi: 10.3389/fpls.2022.974625. PMID: 36247629; PMCID: PMC9558118.
+[^3]: Yuan, J.S., Reed, A., Chen, F. et al. Statistical analysis of real-time PCR data. BMC Bioinformatics 7, 85 (2006). https://doi.org/10.1186/1471-2105-7-85
 
-[^4]: Yuan, J.S., Reed, A., Chen, F. et al. Statistical analysis of real-time PCR data. BMC Bioinformatics 7, 85 (2006). https://doi.org/10.1186/1471-2105-7-85
+[^4]: Obermeyer S, Stöckl R, Schnekenburger T, Moehle C, Schwartz U, Grasser KD. Distinct role of subunits of the Arabidopsis RNA polymerase II elongation factor PAF1C in transcriptional reprogramming. Front Plant Sci. 2022 Sep 29;13:974625. doi: 10.3389/fpls.2022.974625. PMID: 36247629; PMCID: PMC9558118.
