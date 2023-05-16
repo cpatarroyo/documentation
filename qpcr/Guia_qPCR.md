@@ -29,11 +29,11 @@ Finalmente, lo último para tener en cuenta es que estos valores tienen que norm
 3. Se calcula el &Delta;&Delta;Ct.
   - &Delta;&Delta;Ct = &Delta;Ct gen - &Delta;Ct hk
 4. Finalmente se calcula la diferencia de expresión (*fold-change*) del gen de interés.
-  - *fold-change* = 2^-(&Delta;&Delta;Ct).
+  - *fold-change* = 2<sup>-(&Delta;&Delta;Ct)</sup>.
 
   > Esto es asumiendo que la eficiencia de la reacción es del 100%. Es decir que cada ciclo la cantidad de producto de PCR es **exactamente** el doble que en el ciclo anterior. Esto es lo esperado para amplicones de alrededor de 150pb [^1]. Sin embargo, la formula propuesta por Livak y Schmittgen incluye el valor de la eficiencia y se puede reemplazar cuando este valor es diferente al 100% de la siguiente manera:
   
-  > Diferencia de expresión = (1+Eficiencia)^-(&Delta;&Delta;Ct).
+  > Diferencia de expresión = (1+Eficiencia)<sup>-(&Delta;&Delta;Ct)</sup>.
 
 ## Calculos
 
@@ -43,7 +43,7 @@ Guía para calcular expresión diferencial de un gen usando el paquete de R `pcr
 
 Antes de hacer los cálculos de eficiencia de la reacción y de expresión diferencial es necesario organizar los datos en un formato compatible con el paquete `pcr`. Primero se promedian los valores de Ct de las replicas técnicas para cada una de las replicas biológicas. Luego los valores de Ct se organizan en filas y los genes en columnas de la siguiente manera:
 
-|b-tubulina|Fenol-Monooxigenasa|
+|fenol_monooxigenasa|b_tubulina|
 |-----------|-------------|
 |30.72|23.70|
 |30.34|23.56|
@@ -64,7 +64,7 @@ A pesar de que las muestras deben estar organizadas por tratamiento (en este cas
 
 Los datos correspondientes a la curva se organizan de la misma manera en una tabla que contiene los valores de Ct por separado (sin promediar) para las diferentes diluciones: 
 
-|b-tubulina|Fenol-Monooxigenasa|
+|fenol_monooxigenasa|b_tubulina|
 |-----------|-------------|
 |25.57823| 22.60794|
 |25.53636| 22.68348|
@@ -85,14 +85,92 @@ Los datos correspondientes a la curva se organizan de la misma manera en una tab
 Y luego se crea un vector con los valores relativos de las diluciones seriadas de la siguiente manera:
 
 ```
-#Para una curva de 5 puntos de diluciones seriadas 1:10
-diluciones <- rep(c(1,0.1,0.01,0.001,0.0001), each= 3)
+#Para una curva de 5 puntos de diluciones seriadas 1:2
+diluciones <- rep(c(1,0.5,0.2,0.1,0.05), each= 3)
 ```
+
+Para continuar con los siguientes pasos debemos tener 4 objetos:
+- Un `data.frame` con los datos de Ct para los genes a comparar en las condiciones estudiadas (llamado `datos_ct` para este ejemplo).
+- Un vector con los tratamientos del montaje experimental (en este ejemplo `tratamientos`).
+- Un `data.frame` con los datos de Ct para la curva estándar (llamado `datos_curva` para este ejemplo).
+- Un vector con los valores de las diluciones de la curva (en este ejemplo `diluciones`).
 
 ### Cálculo de la eficiencia de reacción
 
+Para el cálculo de la eficiencia se utilizan las funciones `pcr_standard` y `pcr_efficiency `. Con estas se puede hacer una revisión visual y cuantitativa de la eficiencia de amplificación respectivamente.
+
+#### Visualización
+
+Para graficar la curva: 
+
+`pcr_standard(datos_curva, amount = diluciones, plot = T)`
+
+La curva resultante debe ser una recta diagonal entre el logaritmo de la concentración (en este ejemplo el logaritmo de los valores de `diluciones` donde están las concentraciones relativas a el stock inicial) tanto para el gen *housekeeping* como para el gen de interés. Para ver los parámetros de la regresión lineal: 
+
+`pcr_standard(datos_curva, amount = diluciones)`
+
+```
+gene                   intercept     slope    r_squared
+1 fenol_monooxigenasa  25.69669   -3.388095   0.9965504
+2 b_tubulina           22.68221   -3.414551   0.9990278
+```
+
+Esto arroja el intercepto (*intercept*), la pendiente (*slope*) y el **R<sup>2</sup>** (*r_squared*) de una regresión lineal hecha para los datos de Ct y el logaritmo de la concentración. Entre mas alta la eficiencia el valor de **R<sup>2</sup>** será más cercano a 1.
+
+#### Cuantificación de la eficiencia
+
+Para hacer una evaluación mas cuantitativa de la eficiencia se usa el siguiente comando:
+
+`pcr_assess(datos_curva, amount = diluciones, reference_gene = 'b-tubulina', method = 'efficiency')`
+
+```
+gene                     intercept    slope       r_squared
+1 fenol_monooxigenasa    3.01448      0.02645619  0.02070273
+```
+
+Este método calcula una regresión lineal entre el &Delta;Ct y el logaritmo de la concentración dada por los datos en `diluciones`. El resultado ideal es que en cada concentración de la curva de calibración la diferencia entre los Ct del gen de interés y el *housekeeping* (&Delta;Ct) se mantenga constante. Es decir que en el caso ideal la pendiente de esa regresión debe ser 0. La recomendación es que si la pendiente (*slope*) de esta regresión es 0.01 o menor se puede usar el método de 2<sup>-&Delta;&Delta;Ct</sup> [^2].
+
+Si la pendiente es mayor se recomienda hacer el cálculo de la expresión diferencial por el método de modelo de curva relativa [^2].
+
 ### Cálculo de expresión diferencial
 
+#### Método 2<sup>-&Delta;&Delta;Ct</sup> 
+
+Para hacer el cálculo de la expresión diferencial por este método se utiliza el siguiente comando:
+
+`pcr_analyze(datos_ct, group_var = tratamiento, reference_gene = 'b_tubulina', reference_group ='brain')`
+
+```
+   group    gene                      normalized calibrated   relative_expression   error       lower     upper
+1  Glucosa  fenol_monooxigenasa       6.860      0.000        1.000000              0.17395402  0.886410  1.128146
+2  Fenol    fenol_monooxigenasa       4.365     -2.495        5.637283              0.09544632  5.276399  6.022850
+```
+
+Este análisis arroja la expresión relativa del gen de interés (en este caso la fenol monooxigenasa) en el grupo control (Glucosa) y el o los grupos experimentales (en este caso solo un grupo experimental: Fenol). La expresión relativa del gen en el grupo control será siempre 1 porque esta se usa como la unidad de medida en las demás condiciones. En este caso la fenol monooxigenasa se expresa 5.637283 veces en la condición de Fenol a lo que se expresa en la condición control Glucosa. 
+
+Adicionalmente este análisis regresa la desviación estándar (*error*), calculada con las replicas de cada muestra. El intervalo inferior (*lower*) y superior (*upper*) del valor de la expresión relativa. 
+
+#### Modelo de curva relativa
+
+Antes de hacer el análisis de expresión diferencial por este método, es importante traer la información de la curva estándar para utilizarla en estos cálculos. 
+
+```
+info_curva <- pcr_standard(datos_curva, amount = diluciones)
+intercepto <- info_curva$intercept
+pendiente <- info_curva$slope
+```
+
+Teniendo estos datos, el cálculo de la expresión diferencial por este método se utiliza el siguiente comando:
+
+`pcr_analyze(datos_ct, group_var = tratamiento, reference_gene = 'b_tubulina', reference_group ='Glucosa', method = 'relative_curve', intercept = intercepto, slope = pendiente)`
+
+```
+   group    gene                  normalized    calibrated  error       lower       upper
+1  Glucosa  fenol_monooxigenasa   0.07310336    1.000000    0.00853403  0.8832608   1.116739
+2  Fenol    fenol_monooxigenasa   0.39921713    5.460996    0.02551356  5.3970866   5.524905
+```
+
+Para este ejemplo, debido a que la eficiencia de reacción no es del 100% como se mostró en la sección de cuantificación de la eficiencia, el método mas acertado para calcular la expresión diferencial es el de la curva relativa estándar. Esto se evidencia en que la desviación estándar de la cuantificación es mucho menor cuando se calcula por este método comparado con el método &Delta;&Delta;Ct.
 
 [^1]: Livak KJ, Schmittgen TD. Analysis of relative gene expression data using real-time quantitative PCR and the 2(-Delta Delta C(T)) Method. Methods. 2001 Dec;25(4):402-8. https://doi.org/10.1006/meth.2001.1262. PMID: 11846609.
 
